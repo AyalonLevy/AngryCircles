@@ -6,6 +6,8 @@ namespace Config {
 	const float GRAVITY = 981.0f;  // [pixels/s^2]
 	const float FRICTION = 0.98f;
 	const float MIN_VELOCITY = 10.0f;  // [pixels/s] Stop moving if slower than this
+	const float FLOOR_Y = 650.0f;
+	const float BOUNCE_RESTITUTION = 0.5f;  // Energy kept after a bounce (0 to 1)
 
 	// Combat / Gameplay
 	const float DAMAGE_COLOR_MULTIPLIER = 0.8f;
@@ -32,7 +34,8 @@ namespace Config {
 
 	const ProjectileProfile STANDARD_BALL = { 15.0f, 1.0f, sf::Color::Red };
 	const ProjectileProfile HEAVY_BALL = { 25.0f, 3.0f, sf::Color::Blue };
-
+	
+	// Block Profiles
 	struct BlockProfile {
 		float width;
 		float height;
@@ -42,6 +45,7 @@ namespace Config {
 
 	const BlockProfile WOOD_BLOCK = { 40.0f, 60.0f, 2.0f, sf::Color(160, 82, 45) };
 
+	// Level Profiles
 	struct LevelConfig {
 		int rows;
 		int cols;

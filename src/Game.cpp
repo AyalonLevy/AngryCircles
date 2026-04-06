@@ -128,11 +128,35 @@ void Game::render()
 
 	// Draw the "Slingshot" (just a simple line for now)
 	if (m_isAiming) {
+		// Calculate the relative displacement of the mouse
+		sf::Vector2f mouseDisplacement = m_currentMousePos - m_mousePressPos;
+
+		// The "Visual" end of the rubber band is the Nozzle + that displacement
+		sf::Vector2f visualEndOfBand = Config::SLINGSHOT_POS + mouseDisplacement;
+
 		sf::Vertex line[] = {
 			sf::Vertex(Config::SLINGSHOT_POS, sf::Color(150, 75, 0)),
-			sf::Vertex(m_currentMousePos, sf::Color::White)
+			sf::Vertex(visualEndOfBand, sf::Color::White)
 		};
 		m_window.draw(line, 2, sf::Lines);
+	}
+
+	// Draw the floor using Config::FLOOR_Y
+	{
+		sf::RectangleShape floorVisual;
+
+		// Position the floor at x = 0 and y = FLOOR_Y
+		floorVisual.setPosition(0.0f, Config::FLOOR_Y);
+
+		// Size spans full width and extends down to the bottom of the screen
+		float width = static_cast<float>(Config::SCREEN_WIDTH);
+		float height = static_cast<float>(Config::SCREEN_HEIGHT) - Config::FLOOR_Y;
+		floorVisual.setSize(sf::Vector2f(width, height));
+
+		// Choose a fill color (ground-like)
+		floorVisual.setFillColor(sf::Color(80, 50, 30));
+
+		m_window.draw(floorVisual);
 	}
 
 	m_window.display();

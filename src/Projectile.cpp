@@ -26,6 +26,13 @@ void Projectile::update(float dt) {
 	// Kinematics: X = X0 + vt
 	m_position += m_velocity * dt;
 
+	// Floor Collision Constraint
+	if (m_position.y + m_shape.getRadius() > Config::FLOOR_Y) {
+		m_position.y = Config::FLOOR_Y - m_shape.getRadius();	// Snap to top of floor
+		m_velocity.y *= -Config::BOUNCE_RESTITUTION;			// Reverse and dampen Y velocity
+		m_velocity.x *= Config::FRICTION;						// Apply ground friction
+	}
+
 	m_shape.setPosition(m_position);
 }
 
