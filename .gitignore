@@ -1,0 +1,12 @@
+# Ignore Visual Studio temporary files
+.vs/
+out/
+build/
+
+# Ignore compiled binaries
+x64/
+Debug/
+Release/
+*.exe
+*.dll
+*.pdb
