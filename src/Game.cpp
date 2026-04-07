@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "CollisionManager.h"
 
 
 Game::Game()
@@ -98,8 +99,8 @@ void Game::fireProjectile(sf::Vector2f velocity)
 void Game::spawnLevel() {
 	for (int i = 0; i < Config::LEVEL_1.rows; ++i) {
 		for (int j = 0; j < Config::LEVEL_1.cols; ++j) {
-			float x = Config::LEVEL_1.startPos.x + (j * (Config::WOOD_BLOCK.width + 5.0f));
-			float y = Config::LEVEL_1.startPos.y - (i * (Config::WOOD_BLOCK.height + 5.0f));
+			float x = Config::LEVEL_1.startPos.x + (j * (Config::WOOD_BLOCK.width + Config::LEVEL_1.spacing));
+			float y = Config::LEVEL_1.startPos.y - (i * (Config::WOOD_BLOCK.height + Config::LEVEL_1.spacing));
 
 			m_blocks.push_back(std::make_unique<StructureBlock>(
 				x, y,
@@ -163,13 +164,17 @@ void Game::render()
 }
 
 void Game::update(float dt) {
-	for (auto& p : m_projectiles) {
-		p->update(dt);
-	}
+	// Move everything (Integration)
+	for (auto& p : m_projectiles) p->update(dt);
+	for (auto& b : m_blocks) b->update(dt);
 
-	for (auto& b : m_blocks) {
-		b->update(dt);
-	}
+	// Resolve Physics
+	CollisionManager::handleCollisions(m_projectiles, m_blocks);
+
+	// Cleanup destroyed blocks
+	m_blocks.erase(std::remove_if(m_blocks.begin(), m_blocks.end(),
+		[](const std::unique_ptr<StructureBlock>& b) { return b->isDestroyed(); }),
+		m_blocks.end());
 }
 
 

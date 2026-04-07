@@ -13,4 +13,6 @@ public:
 	void launch(sf::Vector2f veocity);
 	void update(float dt) override;
 	void draw(sf::RenderWindow& window) override;
+
+	float getRadius() const { return m_shape.getRadius(); }
 };

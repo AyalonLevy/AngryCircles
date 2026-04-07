@@ -138,6 +138,7 @@
     <None Include=".gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\CollisionManager.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -145,10 +146,12 @@
     <ClCompile Include="src\StructureBlock.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\CollisionManager.h" />
     <ClInclude Include="include\Constants.h" />
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\Game.h" />
     <ClInclude Include="include\Projectile.h" />
+    <ClInclude Include="include\RigidBody.h" />
     <ClInclude Include="include\StructureBlock.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,6 +7,9 @@ Projectile::Projectile(float x, float y, float radius, float mass, sf::Color col
 	m_shape.setFillColor(m_color);
 	m_shape.setOrigin(radius, radius);
 	m_shape.setPosition(m_position);
+
+	// Inertia of a solid disk: I = 1/2 * m * r^2
+	m_inertia = 0.5f * m_mass * (radius * radius);
 }
 
 void Projectile::launch(sf::Vector2f initialVelocity) {

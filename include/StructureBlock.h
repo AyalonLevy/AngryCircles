@@ -17,4 +17,14 @@ public:
 	void takeDamage(float amount);
 	bool isDestroyed() const { return m_health <= 0; }
 	float getDamagePercentage() const { return (1.0f - (m_health / m_maxHealth)) * 100.0f; }
+
+	// Returns the corners of the rectangle in world space
+	std::vector<sf::Vector2f> getVertices() const;
+
+	// Returns ther normalized local X and Y areas of the shape
+	sf::Vector2f getLocalXAxis() const;
+	sf::Vector2f getLocalYAxis() const;
+
+	sf::Vector2f getSize() const { return m_shape.getSize(); }
+	float getRotation() const { return m_shape.getRotation(); }  // in degrees
 };
