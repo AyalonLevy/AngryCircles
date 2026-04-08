@@ -8,7 +8,7 @@ private:
 	float m_maxHealth;
 
 public:
-	StructureBlock(float x, float y, float width, float height, float mass, sf::Color color);
+	StructureBlock(float x, float y, float width, float height, float mass, float staticFriction, float dynamicFriction, float restitution, sf::Color color);
 
 	void update(float dt) override;
 	void draw(sf::RenderWindow& window) override;

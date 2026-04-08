@@ -19,6 +19,24 @@ void Game::initWindow() {
 
 	// Limits the framerate to the monitor's refreshrate to avoid 100% CPU usage
 	m_window.setFramerateLimit(60);
+
+	// Create a very wide, thin block for the floor
+	// Positioned at the center of the screen width, at FLOOR_Y
+	float floorWidth = (float)Config::SCREEN_WIDTH * 2.0f;
+	float floorHeight = 100.0f;
+
+	m_floor = std::make_unique<StructureBlock>(
+		(float)Config::SCREEN_WIDTH / 2.0f,
+		Config::FLOOR_Y + (floorHeight / 2.0f),
+		floorWidth, floorHeight,
+		0.0f,	// MASS = 0 makes it STATIC
+		0.9f,	// static friction
+		0.8f,	// dynamic friction
+		0.2f,	// almost no bounce
+		sf::Color(80, 50, 30)
+	);
+
+	m_floor->update(0.f);
 }
 
 void Game::initSlignshot() {
@@ -89,6 +107,9 @@ void Game::fireProjectile(sf::Vector2f velocity)
 		Config::SLINGSHOT_POS.y,
 		Config::STANDARD_BALL.radius,
 		Config::STANDARD_BALL.mass,
+		Config::STANDARD_BALL.staticFriction,
+		Config::STANDARD_BALL.dynamicFriction,
+		Config::STANDARD_BALL.restitution,
 		Config::STANDARD_BALL.color
 	);
 
@@ -107,6 +128,9 @@ void Game::spawnLevel() {
 				Config::WOOD_BLOCK.width,
 				Config::WOOD_BLOCK.height,
 				Config::WOOD_BLOCK.mass,
+				Config::WOOD_BLOCK.staticFriction,
+				Config::WOOD_BLOCK.dynamicFriction,
+				Config::WOOD_BLOCK.restitution,
 				Config::WOOD_BLOCK.color
 			));
 		}
@@ -116,6 +140,11 @@ void Game::spawnLevel() {
 void Game::render()
 {
 	m_window.clear(sf::Color(25, 25, 30));  // Dark blue-ish night sky - TODO: add background
+
+	// Draw the floor
+	if (m_floor) {
+		m_floor->draw(m_window);
+	}
 
 	// Draw all projectiles
 	for (auto& p : m_projectiles) {
@@ -142,39 +171,33 @@ void Game::render()
 		m_window.draw(line, 2, sf::Lines);
 	}
 
-	// Draw the floor using Config::FLOOR_Y
-	{
-		sf::RectangleShape floorVisual;
-
-		// Position the floor at x = 0 and y = FLOOR_Y
-		floorVisual.setPosition(0.0f, Config::FLOOR_Y);
-
-		// Size spans full width and extends down to the bottom of the screen
-		float width = static_cast<float>(Config::SCREEN_WIDTH);
-		float height = static_cast<float>(Config::SCREEN_HEIGHT) - Config::FLOOR_Y;
-		floorVisual.setSize(sf::Vector2f(width, height));
-
-		// Choose a fill color (ground-like)
-		floorVisual.setFillColor(sf::Color(80, 50, 30));
-
-		m_window.draw(floorVisual);
-	}
-
 	m_window.display();
 }
 
 void Game::update(float dt) {
-	// Move everything (Integration)
-	for (auto& p : m_projectiles) p->update(dt);
-	for (auto& b : m_blocks) b->update(dt);
+	// Apply force
+	auto applyForces = [&](Entity* e) {
+		if (e->getInvMass() > 0) {
+			e->applyForce({ 0.f, e->getMass() * Config::GRAVITY }, e->getPosition());
+		}
+	};
 
-	// Resolve Physics
-	CollisionManager::handleCollisions(m_projectiles, m_blocks);
+	if (m_floor) applyForces(m_floor.get());
+	for (auto& p : m_projectiles) applyForces(p.get());
+	for (auto& b : m_blocks) applyForces(b.get());
 
-	// Cleanup destroyed blocks
-	m_blocks.erase(std::remove_if(m_blocks.begin(), m_blocks.end(),
-		[](const std::unique_ptr<StructureBlock>& b) { return b->isDestroyed(); }),
-		m_blocks.end());
+	// Solve collisions
+	CollisionManager::handleCollisions(m_projectiles, m_blocks, m_floor.get());
+
+	// Integrate
+	auto integratePass = [&](Entity* e) {
+		e->integrate(dt);
+		e->update(dt);
+	};
+	
+	if (m_floor) integratePass(m_floor.get());
+	for (auto& p : m_projectiles) integratePass(p.get());
+	for (auto& b : m_blocks) integratePass(b.get());
 }
 
 

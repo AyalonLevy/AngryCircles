@@ -21,6 +21,9 @@ private:
 	std::vector<std::unique_ptr<Projectile>> m_projectiles;
 	std::vector<std::unique_ptr<StructureBlock>> m_blocks;
 
+	// The Foloor Entity
+	std::unique_ptr<StructureBlock> m_floor;
+
 	// Initialization
 	void initWindow();
 	void spawnLevel();  // Helper to setup the blocks

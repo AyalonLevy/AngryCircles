@@ -8,7 +8,7 @@ private:
 
 public:
 	// Pass everything needed to configure the projectile
-	Projectile(float x, float y, float radius, float mass, sf::Color color);
+	Projectile(float x, float y, float radius, float mass, float staticFriction, float dynamicFriction, float restitution, sf::Color color);
 
 	void launch(sf::Vector2f veocity);
 	void update(float dt) override;

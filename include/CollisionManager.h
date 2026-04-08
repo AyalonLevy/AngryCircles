@@ -8,7 +8,8 @@ class CollisionManager {
 public:
 	static void handleCollisions(
 		std::vector<std::unique_ptr<Projectile>>& projectiles,
-		std::vector<std::unique_ptr<StructureBlock>>& blocks
+		std::vector<std::unique_ptr<StructureBlock>>& blocks,
+		StructureBlock* floor
 	);
 
 private:
@@ -33,4 +34,6 @@ private:
 	}
 
 	static void projectRectangle(const StructureBlock& rect, sf::Vector2f axis, float& min, float& max);
+
+	static bool isPointInsideOBB(sf::Vector2f p, const StructureBlock& rect);
 };
