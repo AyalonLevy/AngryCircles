@@ -12,6 +12,15 @@ public:
 		StructureBlock* floor
 	);
 
+	static bool showDebugForces;
+
+	static void drawDebugForces(sf::RenderWindow& window,
+		const std::vector<std::unique_ptr<Projectile>>& projectiles,
+		const std::vector<std::unique_ptr<StructureBlock>>& blocks,
+		StructureBlock* floor);
+
+	void applyStaticEquilibrium(std::vector<std::unique_ptr<StructureBlock>>& blocks, StructureBlock* floor);
+
 private:
 	// Circle vs Oriented Rectangle
 	static bool checkCircleOBB(Projectile& circle, StructureBlock& block);
@@ -36,4 +45,6 @@ private:
 	static void projectRectangle(const StructureBlock& rect, sf::Vector2f axis, float& min, float& max);
 
 	static bool isPointInsideOBB(sf::Vector2f p, const StructureBlock& rect);
+
+	static void drawArrow(sf::RenderWindow& window, sf::Vector2f start, sf::Vector2f force, sf::Color color);
 };

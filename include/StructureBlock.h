@@ -21,10 +21,6 @@ public:
 	// Returns the corners of the rectangle in world space
 	std::vector<sf::Vector2f> getVertices() const;
 
-	// Returns ther normalized local X and Y areas of the shape
-	sf::Vector2f getLocalXAxis() const;
-	sf::Vector2f getLocalYAxis() const;
-
 	sf::Vector2f getSize() const { return m_shape.getSize(); }
 	float getRotation() const { return m_shape.getRotation(); }  // in degrees
 };

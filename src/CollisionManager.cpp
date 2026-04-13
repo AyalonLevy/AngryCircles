@@ -158,6 +158,14 @@ void CollisionManager::resolveCollision(Entity& a, Entity& b, sf::Vector2f norma
 	a.setPosition(a.getPosition() + correction * a.getInvMass());
 	b.setPosition(b.getPosition() - correction * b.getInvMass());
 
+	printf("normal X: %f\n", normal.x);
+	if (std::abs(normal.x) < 0.3f && normal.y < 0.f) {
+		sf::Vector2f normalForce(0.f, -a.getMass() * Config::GRAVITY);
+		printf("normalForce X: %f\n", normalForce.x);
+		printf("normalForce X: %f\n", normalForce.y);
+		a.applyForce(normalForce, contactPoint);
+	}
+
 	// 2. Contact vectors
 	sf::Vector2f ra = contactPoint - a.getPosition();
 	sf::Vector2f rb = contactPoint - b.getPosition();
@@ -293,4 +301,49 @@ bool CollisionManager::isPointInsideOBB(sf::Vector2f p, const StructureBlock& re
 	sf::Vector2f localP = inverseRotateVector(p - rect.getPosition(), rect.getRotation() * (Config::PI / 180.f));
 	sf::Vector2f h = rect.getSize() * 0.5f;
 	return (std::abs(localP.x) <= h.x && std::abs(localP.y) <= h.y);
+}
+
+//  FOR DEBUGING
+bool CollisionManager::showDebugForces = false;
+
+void CollisionManager::drawDebugForces(sf::RenderWindow& window, const std::vector<std::unique_ptr<Projectile>>& projectiles, const std::vector<std::unique_ptr<StructureBlock>>& blocks, StructureBlock* floor) {
+	if (!showDebugForces) return;
+
+	auto drawEntityForce = [&](Entity* e) {
+		if (!e || e->getInvMass() == 0) return;
+
+		sf::Vector2f forceVector = e->getLastTotalForce();
+
+		drawArrow(window, e->getPosition(), forceVector * 0.1f, sf::Color::White);
+	};
+
+	for (auto& p : projectiles) drawEntityForce(p.get());
+	for (auto& b : blocks) drawEntityForce(b.get());
+}
+
+void CollisionManager::drawArrow(sf::RenderWindow& window, sf::Vector2f start, sf::Vector2f force, sf::Color color) {
+	float actualLength = std::sqrt(force.x * force.x + force.y * force.y);
+
+	if (actualLength < Config::EPSILON) return;
+
+	float visualLength = std::clamp(actualLength * 0.05f, 20.0f, 100.0f);
+
+	sf::Vector2f direction = force / actualLength;
+	sf::Vector2f visualEnd = start + (direction * visualLength);
+
+	sf::Vertex line[] = {
+		sf::Vertex(start, color),
+		sf::Vertex(visualEnd, color)
+	};
+	window.draw(line, 2, sf::Lines);
+
+	sf::CircleShape tip(4.0f);
+	tip.setFillColor(color);
+	tip.setOrigin(4.0f, 4.0f);
+	tip.setPosition(visualEnd);
+
+	/*float angle = std::atan2(direction.y, direction.x) * (180.0f / Config::PI);
+	tip.setRotation(angle + 90.0f);*/
+
+	window.draw(tip);
 }

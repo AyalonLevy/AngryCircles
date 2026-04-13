@@ -8,6 +8,8 @@ protected:
 	sf::Vector2f m_position;
 	sf::Vector2f m_velocity;
 	sf::Vector2f m_force;	// Reset to 0 every frame after integration
+	sf::Vector2f m_lastTotalForce;
+	sf::Vector2f m_supportForce;
 
 	// Angular
 	float m_angle = 0.0f;			// [rad] for math
@@ -27,52 +29,9 @@ protected:
 	sf::Color m_color;
 
 public:
-	void applyForce(sf::Vector2f force, sf::Vector2f contactPoint) {
-		m_force += force;
+	void applyForce(sf::Vector2f force, sf::Vector2f contactPoint);
 
-		// Torque = r x F
-		sf::Vector2f r = contactPoint - m_position;
-		m_torque += (r.x * force.y - r.y * force.x);
-	}
-
-	void integrate(float dt) {
-		if (m_invMass == 0)
-			return;
-
-		// Update Velocities
-		sf::Vector2f acceleration = m_force * m_invMass;
-		m_velocity += acceleration * dt;
-		float speed = std::sqrt(m_velocity.x * m_velocity.x + m_velocity.y * m_velocity.y);
-		
-		// Linear clamp
-		if (speed > Config::MAX_LINEAR_VELOCITY)
-			m_velocity = (m_velocity / speed) * Config::MAX_LINEAR_VELOCITY;
-		
-		// Angular clamp
-		if (std::abs(m_angularVelocity) > Config::MAX_ANGULAR_VELOCITY)
-			m_angularVelocity = (m_angularVelocity > 0 ? 1 : -1) * Config::MAX_ANGULAR_VELOCITY;
-
-
-		float angularAccel = m_torque * m_invInertia;
-		m_angularVelocity += angularAccel * dt;
-
-		// Apply Damping
-		m_velocity *= Config::FRICTION;
-		m_angularVelocity *= Config::ANGULAR_DAMPING;
-
-		// Update Positions
-		m_position += m_velocity * dt;
-		m_angle += m_angularVelocity * dt;
-		
-		// Sleep logic (stopping micro-vinrations)
-		if (std::abs(m_velocity.x) < Config::MIN_LINEAR_VELOCITY) m_velocity.x = 0;
-		if (std::abs(m_velocity.y) < Config::MIN_LINEAR_VELOCITY) m_velocity.y = 0;
-		if (std::abs(m_angularVelocity) < Config::MIN_ANGULAR_VELOCITY) m_angularVelocity = 0;
-
-		// Reset accumulators
-		m_force = { 0.f, 0.f };
-		m_torque = 0.f;
-	}
+		void integrate(float dt);
 
 	// Constructor using member initializer list (Modern C++ Best Practice)
 	Entity(float x, float y, float mass, float staticFriction,
@@ -122,6 +81,12 @@ public:
 	float getStaticFriction() const { return m_staticFriction; }
 	float getDynamicFriction() const { return m_dynamicFriction; }
 	float getRestitution() const { return m_restitution; }
+
+	sf::Vector2f getLastTotalForce() const { return m_lastTotalForce; }
+	void setLastTotalForce(sf::Vector2f f) { m_lastTotalForce = f; }
+
+	void addSupportForce(sf::Vector2f f) { m_supportForce += f; }
+	void resetSupport() { m_supportForce = { 0.f, 0.f }; }
 
 	// Core Interfacae
 	virtual void update(float dt) = 0;

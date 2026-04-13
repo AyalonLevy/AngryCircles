@@ -4,6 +4,20 @@
 namespace Config {
 	// Physics
 	const float GRAVITY = 981.0f;  // [px/s^2]
+	const float PI = 3.14159265f;
+
+	struct Material {
+		float staticFriction;  // mu_s
+		float kineticFriction; // mu_k
+		float restitution;     // bounciness (e)
+	};
+
+	// Example: Wood
+	const Material WOOD = { 0.5f, 0.35f, 0.2f };
+	const Material STEEL = { 0.4f, 0.3f, 0.1f };
+	const Material RUBBER = { 0.9f, 0.8f, 0.8f };
+
+
 	const float FRICTION = 0.999f;			// Linear damping (by 2%)
 	const float ANGULAR_DAMPING = 0.95f;	// Reduce rotation by 5% per frame
 	const float MAX_LINEAR_VELOCITY = 2000.0f;	// [px/s]
@@ -13,7 +27,6 @@ namespace Config {
 	const float MAX_ANGULAR_VELOCITY = 50.0f;	// [deg/s]
 	const float FLOOR_Y = 650.0f;
 	const float RESTITUTION_VELOCITY_THRESHOLD = 1.0f;
-	const float PI = 3.14159265f;
 	const float PENETRATION_CORRETION_PERCENTAGE = 0.2f;
 	const float SLEEP_THRESHOLD = 0.2f;		// Stop miving if speed < 1[px/s]
 	const float SLOP = 0.05f;				// Allow 0.02px overlap before resolving
@@ -95,5 +108,5 @@ namespace Config {
 		sf::Vector2f startPos;
 	};
 
-	const LevelConfig LEVEL_1 = { 2, 2, 20.0f, {800.0f, 600.0f} };
+	const LevelConfig LEVEL_1 = { 1, 1, 20.0f, {800.0f, 600.0f} };
 }
